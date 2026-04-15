@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MasterChef Candidate - Wendy Schofield</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+    <article class="voting-card">
+        <header class="card-header">
+            <div class="avatar-image"><img src="images/pic.jpg" alt=""></div>
+            <div class="header-info">
+                <h1 class="candidate-name">Wendy Schofield</h1>
+                <p class="candidate-id">Candidate #42</p>
+                <span class="badge-verified">Verified</span>
+            </div>
+        </header>
+
+        <section class="content-section">
+            <div class="progress-header">
+                <h2>Progress</h2>
+                <span class="percentage" id="percentage-text">99%</span>
+            </div>
+            
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-bar" style="width: 99%;"></div>
+            </div>
+            
+            <div class="progress-stats">
+                <span><span id="current-votes">5648</span> votes</span>
+                <span><span id="required-votes">5688</span> votes needed</span>
+            </div>
+
+            <div class="timer-banner">
+                <span class="icon">🕒</span>
+                <p>Time remaining: <strong id="countdown-timer">--h --m --s</strong></p>
+            </div>
+        </section>
+
+        <section class="activity-section">
+            <h3 class="section-title">📈 Recent Activity</h3>
+            <div class="activity-row">
+                <div class="voter-image">
+                    <img src="images/pic.jpg" alt="Voter" class="voter-avatar" id="activity-img">
+                </div>
+
+                <div class="voter-info">
+                    <p class="voter-name" id="activity-name">Milosav Mihajlović</p>
+                </div>
+                <div class="voter-method">
+                    <p>voted via</p>
+                    <p id="activity-platform">Facebook</p>
+                </div>
+                <div class="voter-time">
+                    <p id="activity-time">4:30:58</p>
+                    <p id="activity-ampm">AM</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="button-group">
+            <button class="btn btn-ig">Vote With &nbsp; <i class="fa-brands fa-instagram"></i></button>
+            <button class="btn btn-email">Vote With &nbsp; <i class="fa-solid fa-envelope"></i></button>
+            <button class="btn btn-x">Vote With &nbsp; <i class="fa-brands fa-x-twitter"></i></button>
+        </section>
+
+        <footer class="card-footer">
+            <p>🕒 Voting ends in 48 hours</p>
+        </footer>
+    </article>
+<script src="main.js"></script>
+</body>
+</html>

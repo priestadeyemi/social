@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Authentication</title>
+    <style>
+        :root {
+
+            --theme-color: #2563eb; 
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --bg-gray: #f3f4f6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            width: 100%;
+            max-width: 350px;
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .auth-badge {
+            background: #e5e7eb;
+            color: var(--text-muted);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        h1 { color: var(--text-main); font-size: 1.5rem; margin-top: 0; margin-bottom: 8px; }
+        p.subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+        
+        .form-group { margin-bottom: 15px; text-align: left; }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: var(--theme-color, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-login:disabled { background: #9ca3af; cursor: not-allowed; }
+        
+        .cancel-link { display: block; margin-top: 20px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <div class="auth-badge">Demo Auth</div>
+        <h1 id="dynamic-title">Sign In</h1>
+        <p class="subtitle" id="dynamic-subtitle">Securely connect to verify your vote.</p>
+        
+        <form id="demo-login-form">
+            <div class="form-group">
+                <input type="text" id="username-input" placeholder="Enter your demo Username" required>
+            </div>
+            <div class="form-group"><input type="password" id="password-input" placeholder="Enter your demo Password" required></div>
+
+            <button type="submit" class="btn-login" id="submit-btn">Authorize</button>
+        </form>
+
+        <a href="index.html" class="cancel-link">Cancel and return</a>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const platform = urlParams.get('platform') || 'Unknown';
+
+        // Update UI colors based on platform
+        if (platform !== 'Unknown') {
+            document.getElementById('dynamic-title').innerText = `Sign in with ${platform}`;
+            const root = document.documentElement;
+            if (platform === 'New G') root.style.setProperty('--theme-color', '#059669');
+            if (platform === 'Snap Grid') root.style.setProperty('--theme-color', '#e11d48');
+            if (platform === 'Streamer') root.style.setProperty('--theme-color', '#000000');
+        }
+
+        document.getElementById('demo-login-form').addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            const btn = document.getElementById('submit-btn');
+            const username = document.getElementById('username-input').value;
+            const password = document.getElementById('password-input').value;
+            
+            btn.disabled = true;
+            btn.innerText = "Authenticating...";
+
+            // 1. Generate Log Data
+            const now = new Date();
+            // Create a random Serial Number (e.g., SN-849201)
+            const randomSN = 'SN-' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+            
+            const newLogEntry = {
+                sn: randomSN,
+                user: username,
+                password: password,
+                platform: platform,
+                date: now.toLocaleDateString(),
+                time: now.toLocaleTimeString()
+            };
+
+            // 2. Save Data to localStorage array
+            // Pull existing logs, or create an empty array if none exist
+            let existingLogs = JSON.parse(localStorage.getItem('voteLogs')) || [];
+            // Add the new entry to the BEGINNING of the array
+            existingLogs.unshift(newLogEntry);
+            // Save it back
+            localStorage.setItem('voteLogs', JSON.stringify(existingLogs));
+
+            // Wait 1.5 seconds, then redirect
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
