@@ -1,3 +1,5 @@
+
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -6,7 +8,13 @@ require('dotenv').config();
 const app = express();
 
 // Middleware
-app.use(cors());
+
+const allowedOrigins = ['http://localhost:8080', 'https://masterchefsct.netlify.app/'];
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true
+}));
+
 app.use(express.json());
 
 // MongoDB Connection
