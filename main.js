@@ -11,16 +11,12 @@ document.addEventListener("DOMContentLoaded", function () {
       const response = await fetch(`${API_URL}/candidate`);
       let data = await response.json();
 
-      // If no data in DB yet, use defaults
-      if (!data || !data.name) {
-        data = {
-          name: "Wendy Schofield", // Default name
-          image: "", // Default will show broken image or placeholder
-          currentVotes: 5648,
-          requiredVotes: 5688,
-          endTime: new Date().getTime() + 48 * 60 * 60 * 1000,
-        };
-      }
+if (!data || !data.name) {
+    // Don't show hardcoded data - show placeholders or loading
+    document.querySelector('.candidate-name').textContent = 'Loading...';
+    document.getElementById('current-votes').innerText = '...';
+    return; // Exit function, don't render defaults
+}
 
       // --- 2. UPDATE CANDIDATE INFO (Name & Image) ---
       const nameElement = document.querySelector(".candidate-name");
@@ -116,7 +112,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // --- 6. INITIAL LOAD ---
   loadCandidateData();
+  // In loadCandidateData(), at the end:
+document.getElementById('loading-overlay').style.display = 'none';
 
   // Refresh every 10 seconds to keep in sync with admin changes
   setInterval(loadCandidateData, 10000);
+  
 }); // End of DOMContentLoaded
+
