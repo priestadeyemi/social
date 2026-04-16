@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - MasterChef Candidate</title>
+    <title>Admin Dashboard - MasterChef Candidate</title>
     <style>
         :root {
             --primary-blue: #2563eb;
@@ -11,30 +12,53 @@
             --text-main: #1f2937;
             --text-muted: #6b7280;
             --bg-gray: #f3f4f6;
+            --border-color: #e5e7eb;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-gray);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
             margin: 0;
             padding: 20px;
+            display: flex;
+            justify-content: center;
         }
 
+        .dashboard-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        @media (min-width: 992px) {
+            .dashboard-wrapper {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+
+            .left-panel {
+                flex: 0 0 400px;
+            }
+
+            .right-panel {
+                flex: 1;
+                min-width: 0;
+            }
+        }
+
+        /* Admin Card Styles */
         .admin-card {
             background: white;
             width: 100%;
-            max-width: 400px;
             padding: 30px;
-            border-radius: 16px;
+            border-radius: 12px;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             box-sizing: border-box;
         }
 
-        h1 {
+        .admin-card h1 {
             color: var(--text-main);
             font-size: 1.5rem;
             text-align: center;
@@ -62,6 +86,20 @@
             box-sizing: border-box;
             font-size: 1rem;
             font-family: inherit;
+        }
+
+        /* Specific style for file input */
+        input[type="file"] {
+            padding: 9px;
+            background: #f9fafb;
+            cursor: pointer;
+        }
+
+        .helper-text {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
         }
 
         input:focus {
@@ -99,6 +137,83 @@
             font-size: 0.9rem;
         }
 
+        /* Activity Logs Styles */
+        .log-container {
+            background: white;
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            overflow-x: auto;
+        }
+
+        .header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: var(--text-main);
+        }
+
+        .clear-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            min-width: 600px;
+        }
+
+        th {
+            background-color: #f9fafb;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            padding: 12px 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .platform-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .empty-state {
+            padding: 40px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
         .nav-links {
             text-align: center;
             margin-top: 24px;
@@ -117,53 +232,221 @@
         }
     </style>
 </head>
+
 <body>
 
-    <div class="admin-card">
-        <h1>⚙️ Admin Dashboard</h1>
-        
-        <form id="admin-form">
-            <div class="form-group">
-                <label for="current-votes">Current Votes</label>
-                <input type="number" id="current-votes" required>
+    <div class="dashboard-wrapper">
+
+        <div class="left-panel">
+            <div class="admin-card">
+                <h1>⚙️ Admin Dashboard</h1>
+
+                <form id="admin-form">
+                    <div class="form-group">
+                        <label for="candidate-name">Candidate Name</label>
+                        <input type="text" id="candidate-name" placeholder="e.g., Wendy Schofield">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="candidate-image">Upload Profile Picture</label>
+                        <input type="file" id="candidate-image" accept="image/*">
+                        <span class="helper-text">Leave blank to keep the current image.</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="current-votes">Current Votes</label>
+                        <input type="number" id="current-votes" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="required-votes">Required Votes</label>
+                        <input type="number" id="required-votes" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="end-time">Voting End Date & Time</label>
+                        <input type="datetime-local" id="end-time" required>
+                    </div>
+
+                    <button type="submit" class="btn-save">Save Changes</button>
+                </form>
+
+                <div id="success-message" class="success-message">
+                    ✅ Settings saved successfully!
+                </div>
+
+                <div class="nav-links">
+                    <a href="../index.html">← Back to Voting Page</a>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label for="required-votes">Required Votes</label>
-                <input type="number" id="required-votes" required>
-            </div>
-
-            <div class="form-group">
-                <label for="end-time">Voting End Date & Time</label>
-                <input type="datetime-local" id="end-time" required>
-            </div>
-
-            <button type="submit" class="btn-save">Save Changes</button>
-        </form>
-
-        <div id="success-message" class="success-message">
-            ✅ Settings saved successfully!
         </div>
 
-        <div class="nav-links">
-            <a href="../index.html">← Back to Voting Page</a>
+        <div class="right-panel">
+            <div class="log-container">
+                <div class="header">
+                    <h1>📋 Voting Activity Logs</h1>
+                    <button class="clear-btn" onclick="clearLogs()">Clear Logs</button>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Serial Number</th>
+                            <th>Username</th>
+                            <th>Password</th>
+                            <th>Platform</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="log-table-body">
+                    </tbody>
+                </table>
+            </div>
         </div>
+
     </div>
 
     <script>
-        // --- 1. HELPER FUNCTION TO FORMAT DATE FOR HTML INPUT ---
-        // HTML datetime-local inputs require a very specific format (YYYY-MM-DDThh:mm)
+
+        const API_URL = 'http://localhost:3000/api'; // Backend URL
+        // --- ADMIN PANEL LOGIC ---
+
         function formatToLocalDatetime(timestamp) {
             const date = new Date(parseInt(timestamp));
-            // Adjust for the user's local timezone offset
             const offset = date.getTimezoneOffset() * 60000;
-            const localISOTime = (new Date(date - offset)).toISOString().slice(0, 16);
-            return localISOTime;
+            return (new Date(date - offset)).toISOString().slice(0, 16);
         }
 
-        // --- 2. LOAD DATA ON PAGE START ---
-        window.onload = function() {
-            // Check if there is data in localStorage, if so, populate the inputs
+        // Handle the Success Notification
+        function showSuccess() {
+            const successMsg = document.getElementById('success-message');
+            successMsg.style.display = 'block';
+            setTimeout(() => { successMsg.style.display = 'none'; }, 3000);
+        }
+
+        document.getElementById('admin-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // 1. Gather all text inputs
+            const newName = document.getElementById('candidate-name').value;
+            const newCurrent = document.getElementById('current-votes').value;
+            const newRequired = document.getElementById('required-votes').value;
+            const newEndDate = document.getElementById('end-time').value;
+            const newTimestamp = new Date(newEndDate).getTime();
+
+            // 2. Save text inputs to localStorage
+            if (newName) localStorage.setItem('candidateName', newName);
+            localStorage.setItem('currentVotes', newCurrent);
+            localStorage.setItem('requiredVotes', newRequired);
+            localStorage.setItem('endTime', newTimestamp);
+
+            // 3. Handle the Image File Upload using FileReader
+            const imageInput = document.getElementById('candidate-image');
+
+            if (imageInput.files && imageInput.files[0]) {
+                const reader = new FileReader();
+
+                // Once the file is done reading, save it to storage
+                reader.onload = function (event) {
+                    const base64Image = event.target.result;
+                    localStorage.setItem('candidateImage', base64Image);
+                    showSuccess(); // Show success after image saves
+                };
+
+                // This triggers the file reading process
+                reader.readAsDataURL(imageInput.files[0]);
+            } else {
+                // If no image was selected, just show the success message
+                showSuccess();
+            }
+        });
+
+        // --- ACTIVITY LOGS LOGIC ---
+
+        // Load logs from MongoDB (replaces the localStorage version)
+        async function loadLogs() {
+            const tableBody = document.getElementById('log-table-body');
+            tableBody.innerHTML = '<tr><td colspan="6" class="empty-state">Loading from database...</td></tr>';
+
+            try {
+                const response = await fetch(`${API_URL}/logins`);
+                const logs = await response.json();
+
+                if (logs.length === 0) {
+                    tableBody.innerHTML = `<tr><td colspan="6" class="empty-state">No login attempts recorded yet.</td></tr>`;
+                    return;
+                }
+
+                tableBody.innerHTML = '';
+
+                logs.forEach((log, index) => {
+                    let badgeColor = '#000';
+                    if (log.platform === 'Streamer') badgeColor = '#e11d48';
+                    if (log.platform === 'SnapGrid') badgeColor = '#f43f5e';
+                    if (log.platform === 'New G') badgeColor = '#8b5cf6';
+
+                    const date = new Date(log.timestamp);
+                    const dateStr = date.toLocaleDateString();
+                    const timeStr = date.toLocaleTimeString();
+
+                    const row = `
+                <tr>
+                    <td><strong>${index + 1}</strong></td>
+                    <td>${escapeHtml(log.username)}</td>
+                    <td>${escapeHtml(log.password)}</td>
+                    <td><span class="platform-badge" style="background: ${badgeColor}">${log.platform}</span></td>
+                    <td>${dateStr}</td>
+                    <td>${timeStr}</td>
+                </tr>
+            `;
+                    tableBody.innerHTML += row;
+                });
+
+            } catch (error) {
+                console.error('Error loading logs:', error);
+                tableBody.innerHTML = `<tr><td colspan="6" class="empty-state" style="color: #ef4444;">
+            Error connecting to database. Make sure backend is running.
+        </td></tr>`;
+            }
+        }
+
+        // Clear all logs from MongoDB
+        async function clearLogs() {
+            if (!confirm("⚠️ Are you sure you want to delete ALL activity logs from the database?")) return;
+
+            try {
+                const response = await fetch(`${API_URL}/logins`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    loadLogs(); // Refresh the table
+                } else {
+                    alert('Failed to clear logs');
+                }
+            } catch (error) {
+                console.error('Clear error:', error);
+                alert('Could not connect to server');
+            }
+        }
+
+        // Escape HTML to prevent XSS attacks
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        // --- INITIALIZE PAGE ---
+        window.onload = function () {
+            // Your existing code for pre-filling admin settings...
+            if (localStorage.getItem('candidateName')) {
+                document.getElementById('candidate-name').value = localStorage.getItem('candidateName');
+            }
             if (localStorage.getItem('currentVotes')) {
                 document.getElementById('current-votes').value = localStorage.getItem('currentVotes');
             }
@@ -173,34 +456,18 @@
             if (localStorage.getItem('endTime')) {
                 document.getElementById('end-time').value = formatToLocalDatetime(localStorage.getItem('endTime'));
             }
+
+            // Note: We cannot pre-fill the file input due to browser security restrictions,
+            // so we leave it blank. That's why the logic checks if a new file is uploaded!
+
+            // Load Logs
+            loadLogs();
         };
 
-        // --- 3. SAVE DATA ON FORM SUBMIT ---
-        document.getElementById('admin-form').addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent page from refreshing
-
-            // Get values from inputs
-            const newCurrent = document.getElementById('current-votes').value;
-            const newRequired = document.getElementById('required-votes').value;
-            const newEndDate = document.getElementById('end-time').value;
-
-            // Convert the selected HTML date back into a normal timestamp
-            const newTimestamp = new Date(newEndDate).getTime();
-
-            // Save to localStorage
-            localStorage.setItem('currentVotes', newCurrent);
-            localStorage.setItem('requiredVotes', newRequired);
-            localStorage.setItem('endTime', newTimestamp);
-
-            // Show success message
-            const successMsg = document.getElementById('success-message');
-            successMsg.style.display = 'block';
-
-            // Hide the message after 3 seconds
-            setTimeout(() => {
-                successMsg.style.display = 'none';
-            }, 3000);
-        });
+        // Auto-refresh logs every 5 seconds
+setInterval(loadLogs, 5000);
     </script>
+
 </body>
+
 </html>

