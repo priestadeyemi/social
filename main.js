@@ -1,7 +1,7 @@
 const API_URL =
   window.location.hostname === "localhost"
     ? "http://localhost:3000/api"
-    : "https://backend-production-180c.up.railway.app/api";
+    : "masterchefs.up.railway.app/api";
 
 // Wait for the HTML to fully load
 document.addEventListener("DOMContentLoaded", function () {
